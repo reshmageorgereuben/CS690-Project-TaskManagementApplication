@@ -22,7 +22,6 @@ public class DataManager {
         int getLastId = filesaver.getLastTaskID();
         
         task.TaskId = getLastId == 0 ? 1 : getLastId+1;
-        
         this.TaskList.Add(task);
         this.filesaver.AppendData(task);
     }

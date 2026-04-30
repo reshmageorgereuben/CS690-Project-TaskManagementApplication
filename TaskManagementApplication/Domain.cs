@@ -27,6 +27,8 @@ public class Task{
             this.Priority = priority;
             this.Category = category;
             this.Status = status;
+            this.StartTime = starttime;
+            this.EndTime = endtime;
 
     }  
 
