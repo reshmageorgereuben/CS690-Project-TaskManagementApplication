@@ -22,7 +22,7 @@ public class FileSaver
     }
 
        public void AppendData(Task data) {
-        File.AppendAllText(this.fileName, data.TaskId  + "|" +  data.TaskName + "|" + data.Description + "|" + data.Deadline + Environment.NewLine);
+        File.AppendAllText(this.fileName, data.TaskId  + "|" +  data.TaskName + "|" + data.Description + "|" + data.Deadline + "|" + data.Priority + "|" + data.Category + "|" + data.StartTime + "|" + data.EndTime + "|" +  data.Status+"|" + Environment.NewLine);
     }
 
       public void SaveAllData(List<Task> data) {
@@ -32,7 +32,7 @@ public class FileSaver
 
                 foreach (var item in data)
                 {
-                    lines.Add($"{item.TaskId}|{item.TaskName}|{item.Description}|{item.Deadline}|{item.Priority}|{item.Category}");
+                    lines.Add($"{item.TaskId}|{item.TaskName}|{item.Description}|{item.Deadline}|{item.Priority}|{item.Category}|{item.StartTime}|{item.EndTime}|{item.Status}");
                 }
                 File.WriteAllLines(this.fileName, lines);
         

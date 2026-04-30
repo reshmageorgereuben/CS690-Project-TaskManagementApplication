@@ -44,7 +44,13 @@ public class DataManager {
             DateTime deadline = DateTime.Parse(eachItem[3]);
             string priority = eachItem.Length > 4 ? eachItem[4]: "";
             string category = eachItem.Length > 5 ? eachItem[5]: "";
-            TaskListItems.Add(new Task(taskId,taskName,description,deadline,priority,category));
+//            DateTime? startTime = eachItem.Length > 6 ? DateTime.Parse(eachItem[6]): null;
+            DateTime? startTime = DateTime.TryParse(eachItem.ElementAtOrDefault(6), out var parsedST) ? parsedST  : null;
+            //DateTime? endTime = eachItem.Length > 7 ? DateTime.Parse(eachItem[7]): null;
+            DateTime? endTime = DateTime.TryParse(eachItem.ElementAtOrDefault(7), out var parsedET) ? parsedET  : null;
+            string status = eachItem.Length > 8 ? eachItem[8]: "";
+            TaskListItems.Add(new Task(taskId,taskName,description,deadline,priority,category,startTime,endTime,status));
+            
 
         }
 
@@ -61,7 +67,12 @@ public class DataManager {
                     string taskName = eachItem[1];
                     string description = eachItem[2];
                     DateTime deadline = DateTime.Parse(eachItem[3]);
-            TaskList.Add(new Task(task.TaskId,taskName,description,deadline));
+                    string priority = eachItem.Length > 4 ? eachItem[4]: "";
+                    string category = eachItem.Length > 5 ? eachItem[5]: "";
+                    DateTime? startTime = eachItem.Length > 6 ? DateTime.Parse(eachItem[6]): null;
+                    DateTime? endTime = eachItem.Length > 7 ? DateTime.Parse(eachItem[7]): null;
+                    string status = eachItem.Length > 8 ? eachItem[8]: "";
+            TaskList.Add(new Task(int.Parse(eachItem[0]),taskName,description,deadline,priority,category,startTime,endTime,status));
 
         }
         }
