@@ -5,15 +5,13 @@ public class DataManager {
     FileSaver filesaver;
 
 
-    public List<Task> TaskList {get; set;}
-    public User User { get; set; }
-
     public List<TaskItem> TaskList {get; set;}
+    public User User { get; set; }
   
     
     public DataManager(){       
         filesaver = new FileSaver("tasks-list.txt");
-        TaskList = getFileContents().Length > 0 ? getListOfTasks() : new List<Task>(); 
+        TaskList = getFileContents().Length > 0 ? getListOfTasks() : new List<TaskItem>(); 
         User = LoadUser() ?? new User ("Default User");
          
         TaskList = getFileContents().Length > 0 ? getListOfTasks() : new List<TaskItem>(); 
