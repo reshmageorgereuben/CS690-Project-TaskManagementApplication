@@ -1,0 +1,12 @@
+1|Study C#|Practice LINQ and Collections|05/03/2026 00:00:00|High|Work|05/03/2026 09:00:00|05/03/2026 11:00:00|Completed
+2|Grocery Run|Buy weekly groceries|05/04/2026 00:00:00|Medium|Errand|05/04/2026 18:00:00|05/04/2026 19:00:00|To Do
+3|Project Work|Build task manager app|05/01/2026 00:00:00|High|Work|05/01/2026 10:00:00|05/01/2026 14:00:00|Completed
+4|Gym Session|Evening workout|05/02/2026 00:00:00|Low|Personal|05/02/2026 07:00:00|05/02/2026 08:00:00|Completed
+5|Assignments|Complete CS assignment|05/05/2026 00:00:00|High|Work|05/05/2026 16:00:00|05/05/2026 18:00:00|To Do
+6|Doctor Visit|Routine health checkup|05/06/2026 00:00:00|Medium|Personal|05/06/2026 10:00:00|05/06/2026 11:00:00|In Progress
+7|Pay Bills|Electricity and internet bill|05/03/2026 00:00:00|High|Errand|05/03/2026 14:00:00|05/03/2026 15:00:00|Completed
+8|Read Book|Read system design concepts|05/04/2026 00:00:00|Low|Personal|05/04/2026 20:00:00|05/04/2026 21:30:00|In Progress
+9|Team Meeting|Weekly sync with team|05/07/2026 00:00:00|Medium|Work|05/07/2026 10:00:00|05/07/2026 11:00:00|To Do
+10|Car Service|Vehicle maintenance check|05/08/2026 00:00:00|Medium|Errand|05/08/2026 09:00:00|05/08/2026 10:30:00|To Do
+11|Fix Bugs|Resolve login and UI issues|04/20/2026 00:00:00|High|Work|04/18/2026 10:00:00|04/18/2026 13:00:00|In Progress
+12|Submit Report|Monthly performance report submission|04/25/2026 00:00:00|Medium|Work|04/24/2026 09:00:00|04/24/2026 11:00:00|In Progress

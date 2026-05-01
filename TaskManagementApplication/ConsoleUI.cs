@@ -9,6 +9,7 @@ public class ConsoleUI{
 
     public ConsoleUI() {
         dataManager = new DataManager();
+       // ShowReminders();
     }
 
     public void  Show(){
@@ -17,12 +18,13 @@ public class ConsoleUI{
         AnsiConsole.MarkupLine("[blue]===============================================[/]");
         
 
+        ShowReminders();
         bool exit = false;
         while(!exit){
             string choice = AnsiConsole.Prompt(
                         new SelectionPrompt<string>()
                         .Title("Please enter your choice")
-                        .AddChoices( "Create Task", "View Tasks", "Review Performance", "End"));
+                        .AddChoices( "Create Task", "View Tasks", "Time Tracker","Review Performance","Daily Status Update","End"));
 
             
             if( choice == "Create Task") {
@@ -65,7 +67,13 @@ public class ConsoleUI{
 
                         DateTime? endtime = AskOptionalDate("End Time [grey](format: MM/dd/yyyy):[/]");                     
                    
-                       Task newTask = new Task(0,taskName,description,deadline,priority,category,starttime,endtime,status);
+                        string setReminder =   AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                        .Title("Set Reminder:")
+                        .AddChoices("Yes", "No"));
+                        AnsiConsole.MarkupLine($"Set Reminder: [white]{setReminder}[/]");
+                       Task newTask = new Task(0,taskName,description,deadline,priority,category,starttime,endtime,status,setReminder);
+                       
                         dataManager.addtasksToList(newTask); 
                         AnsiConsole.MarkupLine("[green]Task Created Successfully[/]");
                     
@@ -81,7 +89,7 @@ public class ConsoleUI{
                               
                     List<Task> taskListItems = dataManager.TaskList;
 
-                    var table = new Spectre.Console.Table();
+                    var table = new Spectre.Console.Table().Title("[bold cyan] Task Dashboard[/]");
                     table.AddColumn("TaskId");
                     table.AddColumn("Task Name");
                     table.AddColumn("Description");
@@ -91,10 +99,10 @@ public class ConsoleUI{
                     table.AddColumn("Start Time");
                     table.AddColumn("End Time");
                     table.AddColumn("Status");
+                    
                     foreach (var task in taskListItems)
                     {
                         table.AddRow(
-
                             task.TaskId.ToString(),
                             task.TaskName ?? "",
                             task.Description ?? "",
@@ -104,6 +112,7 @@ public class ConsoleUI{
                             task.StartTime.ToString() ?? "",
                             task.EndTime.ToString() ?? "",
                             task.Status ?? ""
+                           
 
 
                         );
@@ -121,7 +130,7 @@ public class ConsoleUI{
                        string operation = AnsiConsole.Prompt(
                         new SelectionPrompt<string>()
                         .Title("Please enter your operation")
-                        .AddChoices( "Update Task", "Delete Task", "Set Priority", "Set Category", "Schedule Time block", "Track Time", "End"));
+                        .AddChoices( "Update Task", "Delete Task", "Set Priority", "Set Category", "Schedule Time Block", "Update Status","End"));
 
 
                         if(operation == "Update Task") {
@@ -158,6 +167,12 @@ public class ConsoleUI{
                                
                                 DateTime? newStartTime = AskOptionalDate("New Start Time [grey](format: MM/dd/yyyy):[/]", editTask.StartTime);
                                 DateTime? newEndTime = AskOptionalDate("New End Time [grey](format: MM/dd/yyyy):[/]", editTask.EndTime);
+
+                                string newSetReminder = AnsiConsole.Prompt(
+                                    new SelectionPrompt<string>()
+                                    .Title($"Set Reminder([green]{editTask.SetReminder}[/])")
+                                    .AddChoices("Yes","No").DefaultValue(editTask.SetReminder));
+                                     AnsiConsole.MarkupLine($"SetReminder: [white]{newSetReminder}[/]");
                               
 
                                
@@ -172,6 +187,7 @@ public class ConsoleUI{
                                         eachItem.StartTime = newStartTime;
                                         eachItem.EndTime = newEndTime;
                                         eachItem.Status = newStatus;
+                                        eachItem.SetReminder = newSetReminder;
                                     }
                                 }
                                 
@@ -185,7 +201,7 @@ public class ConsoleUI{
                              var confirmDelete = AnsiConsole.Confirm("Do you want to delete?");
                              if(confirmDelete){
                                
-                                 dataManager.TaskList.RemoveAll(a => a.TaskId == id);
+                                dataManager.TaskList.RemoveAll(a => a.TaskId == id);
                                 dataManager.SaveAllData();
                                 AnsiConsole.MarkupLine("[green]Task Deleted Successfully[/]");
                                  
@@ -240,7 +256,32 @@ public class ConsoleUI{
                              
                    
                             
-                        }
+                        } else if(operation == "Update Status") {          
+
+                            foreach (var eachItem in dataManager.TaskList)
+                                {
+                                    if (eachItem.TaskId == editTask.TaskId)
+                                    {   
+                                        AnsiConsole.WriteLine($"Current Category:{eachItem.Category}");
+                                        
+                                        string category = AnsiConsole.Prompt(
+                                            new SelectionPrompt<string>()
+                                                .Title("Please select your category")
+                                                .AddChoices("Work", "Errand", "Personal")
+                                        );
+                                        AnsiConsole.WriteLine($"Selected Category:{category}");
+                                        eachItem.Category = category;
+                                    }
+                                }
+
+
+                      
+                          dataManager.SaveAllData();
+                          AnsiConsole.MarkupLine("[green]Category set successfully[/]");                  
+                             
+                   
+                            
+                        } 
                     }
                     else 
                     {
@@ -255,13 +296,152 @@ public class ConsoleUI{
                
 
             } else if( choice == "Review Performance") {
-                Console.WriteLine("Selected Performance REview");
-            }  else{
+                var table = new Table()
+    
+    .Title("[bold cyan] Task Status Review[/]");
+
+table.AddColumn("ID");
+table.AddColumn("Task");
+table.AddColumn("Deadline");
+table.AddColumn("Status");
+
+foreach (var task in dataManager.TaskList.OrderBy(t => t.Status))
+{
+    string statusColor =
+        task.Status == "Completed" ? "green" :
+        task.Status == "In Progress" ? "yellow" :
+        task.Status == "None" ? "white" :
+        "red";
+
+    table.AddRow(
+        task.TaskId.ToString(),
+        task.TaskName,
+        task.Deadline.ToShortDateString(),
+        $"[{statusColor}]{task.Status}[/]"
+    );
+}
+
+AnsiConsole.Write(table);
+
+AnsiConsole.MarkupLine($"[bold cyan] Task Status Summary Report:[/]");
+int none  = dataManager.TaskList.Count(t => t.Status == "None");
+int todo = dataManager.TaskList.Count(t => t.Status == "To Do");
+int inProgress = dataManager.TaskList.Count(t => t.Status == "In Progress");
+int completed = dataManager.TaskList.Count(t => t.Status == "Completed");
+
+AnsiConsole.MarkupLine($"[white]None:[/] {none}");
+AnsiConsole.MarkupLine($"[red]To Do:[/] {todo}");
+AnsiConsole.MarkupLine($"[yellow]In Progress:[/] {inProgress}");
+AnsiConsole.MarkupLine($"[green]Completed:[/] {completed}");
+            }else if(choice == "Time Tracker") {  
+
+                    var tableTrackTime = new Spectre.Console.Table().Title("[bold cyan] Time Tracking Dashboard[/]");
+                    tableTrackTime.AddColumn("TaskId");
+                    tableTrackTime.AddColumn("Task Name");
+                    tableTrackTime.AddColumn("Deadline");
+                    tableTrackTime.AddColumn("Start Time");
+                    tableTrackTime.AddColumn("End Time");
+                    tableTrackTime.AddColumn("Time Spent");
+                    double timespent = 0.0;
+                    foreach (var task in dataManager.TaskList.OrderBy(t => t.Deadline))
+                    {
+                        if(task.StartTime.HasValue && task.EndTime.HasValue) {
+                        timespent = (task.EndTime.Value - task.StartTime.Value).TotalHours;
+                        }
+                        tableTrackTime.AddRow(
+                            task.TaskId.ToString(),
+                            task.TaskName ?? "",
+                            task.Deadline.ToString(),
+                            task.StartTime.ToString() ?? "",
+                            task.EndTime.ToString() ?? "",
+                            timespent.ToString() ?? "N/A"
+
+
+                        );
+                    }
+
+                    AnsiConsole.Write(tableTrackTime);       
+                             
+                   
+                            
+                        } 
+             else if( choice == "Daily Status Update") {
+                              
+                    List<Task> taskListItems = dataManager.TaskList;
+
+                    var table = new Spectre.Console.Table().Title("[bold cyan] Daily Status Update[/]");
+                    table.AddColumn("TaskId");
+                    table.AddColumn("Task Name");
+                    table.AddColumn("Description");
+                    table.AddColumn("Deadline");
+                    table.AddColumn("Priority");
+                    table.AddColumn("Status");
+                    
+                    foreach (var task in taskListItems)
+                    {
+                        table.AddRow(
+                            task.TaskId.ToString(),
+                            task.TaskName ?? "",
+                            task.Description ?? "",
+                            task.Deadline.ToShortDateString(),
+                            task.Priority ?? "",
+                            task.Status ?? ""                        
+
+
+                        );
+                    }
+
+                    AnsiConsole.Write(table);
+                  
+                    int id = GetValidInt("Please enter a Task Id:");
+                        
+                    Task? editTask = taskListItems.FirstOrDefault(t => t.TaskId == id);
+
+                    if (editTask != null)
+                    {
+                      
+
+                            foreach (var eachItem in dataManager.TaskList)
+                                {
+                                    if (eachItem.TaskId == editTask.TaskId)
+                                    {   
+                                        AnsiConsole.WriteLine($"Current Status:{eachItem.Status}");
+                                        
+                                        string status = AnsiConsole.Prompt(
+                                            new SelectionPrompt<string>()
+                                                .Title("Please select the status")
+                                                .AddChoices("To Do", "In Progress", "Completed")
+                                        );
+                                        AnsiConsole.WriteLine($"Selected Status:{status}");
+                                        eachItem.Status = status;
+                                    }
+                                }
+
+
+                      
+                          dataManager.SaveAllData();
+                          AnsiConsole.MarkupLine("[green]Status set successfully[/]");                  
+                             
+                   
+                            
+                    } 
+                    
+                    else 
+                    {
+                       AnsiConsole.MarkupLine("[red]Task Not Found[/]");
+                    }
+                     
+                    
+
+
+               
+
+            } else{
                 exit = AnsiConsole.Confirm("Do you really want to exit?");
                 // if(exit){
                   
                 // }
-            }   
+            }
         }
         
 
@@ -294,4 +474,58 @@ public class ConsoleUI{
         : existing;
 }
 
+public void ShowReminders()
+{
+    var today = DateTime.Today;
+    var tomorrow = DateTime.Today.AddDays(1);
+    // var msgColor = "";
+    List<Reminder> reminderList = new List<Reminder>();
+    foreach(var eachItem in dataManager.TaskList){
+        if(eachItem.Deadline.Date < today){
+            // msgColor = "red";
+            reminderList.Add(new Reminder(eachItem.TaskId, eachItem.TaskName,eachItem.Deadline,"OverDue"));
+        } else if (eachItem.Deadline.Date == today) {
+            // msgColor = "yellow";
+
+            reminderList.Add(new Reminder(eachItem.TaskId, eachItem.TaskName,eachItem.Deadline,"Due Today"));
+        } else if(eachItem.Deadline.Date  == tomorrow) {
+            // msgColor = "blue";
+             reminderList.Add(new Reminder(eachItem.TaskId, eachItem.TaskName,eachItem.Deadline,"Due Tomorrow"));
+        }
+
+    }
+      
+
+    if (reminderList.Count == 0)
+    {
+        AnsiConsole.MarkupLine("[green]✔ No upcoming reminders[/]");
+    }
+     else {
+        var table = new Spectre.Console.Table().Title("[bold cyan] Task Reminder Dashboard[/]");
+                    table.AddColumn("TaskId");
+                    table.AddColumn("Task Name");
+                    table.AddColumn("Deadline");
+                    table.AddColumn("Reminder Message");
+                    foreach (var task in reminderList.OrderBy(t => t.Deadline))
+                    {
+                        string msgColor =
+                        task.Message == "OverDue" ? "red" :
+                            task.Message == "Due Today" ? "yellow" :
+                            "blue";
+                        table.AddRow(
+                            task.TaskID.ToString(),
+                            task.TaskName ?? "",
+                            task.Deadline.ToShortDateString(),
+                            $"[{msgColor}]{task.Message}[/]"
+
+
+                        );
+                    }
+
+                    AnsiConsole.Write(table);
+     }
+
+                    
+
+}
     }
