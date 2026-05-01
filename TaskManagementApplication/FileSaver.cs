@@ -5,7 +5,7 @@ using System.IO;
 
 public class FileSaver
 {
-    string fileName;
+    public string fileName;
     public FileSaver(string fileName)
     {
         this.fileName = fileName;
@@ -15,41 +15,38 @@ public class FileSaver
         }
         
     }
-
-    public void AppendLine(string line)
-    {
-        File.AppendAllText(this.fileName, line + Environment.NewLine);
-    }
-
-       public void AppendData(Task data) {
+    public void AppendData(TaskItem data) {
         File.AppendAllText(this.fileName, data.TaskId  + "|" +  data.TaskName + "|" + data.Description + "|" + data.Deadline + "|" + data.Priority + "|" + data.Category + "|" + data.StartTime + "|" + data.EndTime + "|" +  data.Status+"|" + Environment.NewLine);
     }
 
-      public void SaveAllData(List<Task> data) {
-       
+      public void SaveAllData(List<TaskItem> data) {     
 
-                var lines = new List<string>();
+            var lines = new List<string>();
 
-                foreach (var item in data)
-                {
-                    lines.Add($"{item.TaskId}|{item.TaskName}|{item.Description}|{item.Deadline}|{item.Priority}|{item.Category}|{item.StartTime}|{item.EndTime}|{item.Status}");
-                }
-                File.WriteAllLines(this.fileName, lines);
-        
+            foreach (var item in data)
+            {
+                lines.Add($"{item.TaskId}|{item.TaskName}|{item.Description}|{item.Deadline}|{item.Priority}|{item.Category}|{item.StartTime}|{item.EndTime}|{item.Status}");
+            }
+            File.WriteAllLines(this.fileName, lines);
+    
        
     }
 
       public int getLastTaskID() {
-          var taskFileContent = File.ReadAllLines("tasks-list.txt");
+          var taskFileContent = File.ReadAllLines(this.fileName);
 
           if(taskFileContent.Length > 0){
             var lastItem = taskFileContent[^1];
             var parts = lastItem.Split('|');
-            return int.Parse(parts[0]);
-          }
-          return  0;
+           if (int.TryParse(parts[0], out int id))
+            {
+                return id;
+            }
+          
        
     }
 
+  return 0;
+}
 
 }
