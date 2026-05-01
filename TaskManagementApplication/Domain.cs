@@ -11,10 +11,10 @@ public class Task{
    public DateTime? StartTime { get; set; }
    public DateTime? EndTime { get; set; }
    public string Status { get; set; }
-   public string SetReminder { get; set; }
+   
    
    public Task(int taskID, string taskName, string description, DateTime deadline, string priority, string category,
-    DateTime? starttime, DateTime? endtime, string status, string setReminder){
+    DateTime? starttime, DateTime? endtime, string status){
                     
             this.TaskId = taskID;        
             this.TaskName = taskName;
@@ -25,7 +25,7 @@ public class Task{
             this.Status = status;
             this.StartTime = starttime;
             this.EndTime = endtime;
-            this.SetReminder = setReminder;
+           
 
     }  
 
@@ -43,14 +43,16 @@ public class TimeBlock{
     public DateTime Deadline{ get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; } 
+    public int EstimatedTime { get; set; }
 
-     public TimeBlock(int taskID, string taskName, DateTime deadline, DateTime? starttime, DateTime? endtime){
+     public TimeBlock(int taskID, string taskName, DateTime deadline, DateTime? starttime, DateTime? endtime, int estimatedTime){
                     
             this.TaskID = taskID;        
             this.Deadline = deadline;
             this.StartTime = starttime;
             this.EndTime = endtime;
             this.TaskName   = taskName;
+            this.EstimatedTime = estimatedTime;
 
     }  
       public override string ToString()
@@ -81,6 +83,32 @@ public class Reminder{
 
 }
 
-// public class User {
+public class ProductivityReport {
+
+    public int TotalTask;
+    public int Completed;
+    public int InProgress;
+    public int ToDo;
+    public double CompletionRate;
+
+    public ProductivityReport(int totalTask, int completed, int inprogress, int todo, double completionRate) {
+        this.TotalTask  = totalTask;
+        this.Completed = completed;
+        this.InProgress = inprogress;
+        this.ToDo = todo;
+        this.CompletionRate = completionRate;
+        
+
+    }
     
-// }
+      
+    
+}
+
+public class User {
+    public string username;
+
+    public User (string name){
+        this.username = name;
+    }
+}
