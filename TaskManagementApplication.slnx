@@ -1,2 +1,4 @@
 <Solution>
+  <Project Path="TaskManagementApplication.Test/TaskManagementApplication.Test.csproj" />
+  <Project Path="TaskManagementApplication/TaskManagementApplication.csproj" />
 </Solution>
