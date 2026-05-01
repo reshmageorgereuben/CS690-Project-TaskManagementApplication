@@ -6,10 +6,14 @@ public class DataManager {
 
 
     public List<TaskItem> TaskList {get; set;}
+    public User User { get; set; }
   
     
     public DataManager(){       
         filesaver = new FileSaver("tasks-list.txt");
+        TaskList = getFileContents().Length > 0 ? getListOfTasks() : new List<TaskItem>(); 
+        User = LoadUser() ?? new User ("Default User");
+         
         TaskList = getFileContents().Length > 0 ? getListOfTasks() : new List<TaskItem>(); 
       
     }
@@ -56,6 +60,23 @@ public class DataManager {
         filesaver.SaveAllData(TaskList);
     }
 
+
+    public User LoadUser()
+    {
+        if (!File.Exists("users.txt"))
+            return new User("Default User");
+
+        var name = File.ReadAllText("users.txt").Trim();
+
+        return new User(name);
+        
+    }
+
+    public void SaveUser(User user)
+{
+    File.WriteAllText("users.txt", user.username);
+}
+    
  
 
    

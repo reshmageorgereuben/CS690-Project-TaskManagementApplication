@@ -14,6 +14,8 @@ public class ConsoleUI{
         dataManager = new DataManager();
         taskService = new TaskService(dataManager);
        
+        getUserName();
+       
     }
 
     public void  Show(){
@@ -135,7 +137,46 @@ public class ConsoleUI{
                              
                    
                             
-                        } 
+                        }  else if(operation == "Schedule Time Block") { 
+
+                                foreach (var eachItem in dataManager.TaskList)
+                                    {
+                                        if (eachItem.TaskId == editTask.TaskId)
+                                        {   
+                                            AnsiConsole.WriteLine($"Current Start Time:{eachItem.StartTime}");
+                                            AnsiConsole.WriteLine($"Current End Time:{eachItem.EndTime}");
+                                            
+                                DateTime newStart = AnsiConsole.Prompt(
+                                new TextPrompt<DateTime>("New Start Time (MM/dd/yyyy HH:mm):")
+                            );
+
+                            DateTime newEnd = AnsiConsole.Prompt(
+                                new TextPrompt<DateTime>("New End Time MM/dd/yyyy HH:mm):")
+                            );
+
+        
+                            if (newEnd <= newStart)
+                            {
+                                AnsiConsole.MarkupLine("[red]Invalid time range![/]");
+                                return;
+                            } 
+
+                            eachItem.StartTime = newStart;
+                            eachItem.EndTime = newEnd;
+                            dataManager.SaveAllData();
+                            var estimatedTime = (int)Math.Round((eachItem.EndTime - eachItem.StartTime).Value.TotalHours); 
+                            AnsiConsole.MarkupLine("[green]✔ Task rescheduled successfully![/]"); 
+                            TimeBlock timeBlock = new TimeBlock(eachItem.TaskId, eachItem.TaskName, eachItem.Deadline,eachItem.StartTime,  eachItem.EndTime, estimatedTime);
+                            createSchedule(timeBlock);
+                                            
+                                        }
+                                    }  
+
+
+                        }     
+
+                   
+                            
                     }
                     else 
                     {
@@ -175,16 +216,29 @@ public class ConsoleUI{
 
             AnsiConsole.Write(table);
 
-            AnsiConsole.MarkupLine($"[bold cyan] Task Status Summary Report:[/]");
-            int none  = taskService.GetAllTasks().Count(t => t.Status == "None");
-            int todo = taskService.GetAllTasks().Count(t => t.Status == "To Do");
-            int inProgress = taskService.GetAllTasks().Count(t => t.Status == "In Progress");
-            int completed = taskService.GetAllTasks().Count(t => t.Status == "Completed");
+                var todayTasks = dataManager.TaskList.Where(t => t.Deadline.Date == DateTime.Today).ToList();
 
-            AnsiConsole.MarkupLine($"[white]None:[/] {none}");
-            AnsiConsole.MarkupLine($"[red]To Do:[/] {todo}");
-            AnsiConsole.MarkupLine($"[yellow]In Progress:[/] {inProgress}");
-            AnsiConsole.MarkupLine($"[green]Completed:[/] {completed}");
+            int total = todayTasks.Count;
+            int completed = todayTasks.Count(t => t.Status == "Completed");
+            int inProgress = todayTasks.Count(t => t.Status == "In Progress");
+            int todo = todayTasks.Count(t => t.Status == "To Do" || t.Status == "None");
+
+            double completionRate = total == 0  ? 0 : (completed * 100.0) / total;
+
+            ProductivityReport productivity = new ProductivityReport(total,completed,inProgress,todo,completionRate);
+
+            createProductivityReport(productivity);       
+
+            // AnsiConsole.MarkupLine($"[bold cyan] Task Status Summary Report:[/]");
+            // int none  = taskService.GetAllTasks().Count(t => t.Status == "None");
+            // int todo = taskService.GetAllTasks().Count(t => t.Status == "To Do");
+            // int inProgress = taskService.GetAllTasks().Count(t => t.Status == "In Progress");
+            // int completed = taskService.GetAllTasks().Count(t => t.Status == "Completed");
+
+            // AnsiConsole.MarkupLine($"[white]None:[/] {none}");
+            // AnsiConsole.MarkupLine($"[red]To Do:[/] {todo}");
+            // AnsiConsole.MarkupLine($"[yellow]In Progress:[/] {inProgress}");
+            // AnsiConsole.MarkupLine($"[green]Completed:[/] {completed}");
             } else if(choice == "Time Tracker") {  
 
                     var tableTrackTime = new Spectre.Console.Table().Title("[bold cyan] Time Tracking Dashboard[/]");
@@ -196,7 +250,7 @@ public class ConsoleUI{
                     tableTrackTime.AddColumn("Time Spent");
                     double timespent = 0.0;
                     foreach (var task in taskService.GetAllTasks().OrderBy(t => t.Deadline))
-                    {
+                    {   timespent = 0.0;
                         if(task.StartTime.HasValue && task.EndTime.HasValue) {
                         timespent = (task.EndTime.Value - task.StartTime.Value).TotalHours;
                         }
@@ -400,8 +454,8 @@ public void createTask(){
                        string status = ShowMenu("Status",new[]{"None","To Do", "In Progress", "Completed"} );
                         AnsiConsole.MarkupLine($"Selected Status: [white]{status}[/]");
 
-                        DateTime? starttime = AskOptionalDate("Start Time [grey](format: MM/dd/yyyy):[/]");           
-                        DateTime? endtime = AskOptionalDate("End Time [grey](format: MM/dd/yyyy):[/]");                
+                        DateTime? starttime = AskOptionalDate("Start Time [grey](format: MM/dd/yyyy HH:mm):[/]");           
+                        DateTime? endtime = AskOptionalDate("End Time [grey](format: MM/dd/yyyy HH:mm):[/]");                
                    
                        
                         TaskItem newTask = new TaskItem(0,taskName,description,deadline,priority,category,starttime,endtime,status);
@@ -436,8 +490,8 @@ public void updateTask(TaskItem editTask) {
                                 string newStatus = ShowSelectionPromptWithPreselectValue($"Please select your new status ([green]{editTask.Status}[/])",new[]{"None","To Do", "In Progress", "Completed"},editTask.Status );
                                     AnsiConsole.MarkupLine($"Selected Status: [white]{newStatus}[/]");
                                
-                                DateTime? newStartTime = AskOptionalDate("New Start Time [grey](format: MM/dd/yyyy):[/]", editTask.StartTime);
-                                DateTime? newEndTime = AskOptionalDate("New End Time [grey](format: MM/dd/yyyy):[/]", editTask.EndTime);                            
+                                DateTime? newStartTime = AskOptionalDate("New Start Time [grey](format: MM/dd/yyyy HH:mm):[/]", editTask.StartTime);
+                                DateTime? newEndTime = AskOptionalDate("New End Time [grey](format: MM/dd/yyyy HH:mm):[/]", editTask.EndTime);                            
                               
 
                                 TaskItem newTask = new TaskItem(editTask.TaskId,newName,newDescription,newDeadLine,newPriority,newCategory,newStartTime,newEndTime,newStatus);
@@ -447,4 +501,81 @@ public void updateTask(TaskItem editTask) {
                             
                               AnsiConsole.MarkupLine("[green]Task Updated Successfully[/]");
 }
+//}
+
+public void createProductivityReport(ProductivityReport productivity){                   
+
+                    var table = new Table()
+                    
+                    .Title($"[bold cyan] Daily Productivity Report[/]{DateTime.Today}");
+
+                table.AddColumn("Metric");
+                table.AddColumn("Value");
+
+               
+                table.AddRow("Total Tasks", productivity.TotalTask.ToString());
+                table.AddRow("Completed", productivity.Completed.ToString());
+                table.AddRow("In Progress", productivity.InProgress.ToString());
+                table.AddRow("To Do", productivity.ToDo.ToString());
+                table.AddRow("Completion Rate", $"{productivity.CompletionRate:0.0}%");
+
+                
+                string status =
+                    productivity.CompletionRate >= 80 ? "[green]Excellent[/]" :
+                    productivity.CompletionRate >= 50 ? "[yellow]Average[/]" :
+                    "[red]Low Productivity [/]";
+
+                table.AddRow("Performance", status);
+
+                AnsiConsole.Write(table);
+        }
+  
+
+
+public void createSchedule(TimeBlock timeBlock){
+
+    var table = new Table().Title("[bold cyan] Time Block Schedule[/]");
+
+    table.AddColumn("Task Id");
+    table.AddColumn("Task Name");
+    table.AddColumn("DeadLine");
+    table.AddColumn("Start Time");
+    table.AddColumn("End Time");
+    table.AddColumn("Duration in hrs");
+
+      
+
+            table.AddRow(
+                timeBlock.TaskID.ToString(),
+                timeBlock.TaskName,
+                timeBlock.Deadline.ToString() ?? "",
+                timeBlock.StartTime.ToString() ?? "",
+                timeBlock.EndTime.ToString() ?? "",
+                timeBlock.EstimatedTime.ToString()
+            );
+            AnsiConsole.Write(table);
+    }
+
+    public void getUserName(){
+        
+        if (string.IsNullOrWhiteSpace(dataManager.User.username))
+        {
+            Console.WriteLine("Enter your name:");
+            string name = Console.ReadLine();
+
+            User user = new User(name);
+
+            dataManager.User = user;
+            dataManager.SaveUser(user);
+
+            Console.WriteLine("User saved successfully!");
+        }
+        else
+        {
+            Console.WriteLine($"Welcome back, {dataManager.User.username}!");
+        }
+    }
+
+
+
 }

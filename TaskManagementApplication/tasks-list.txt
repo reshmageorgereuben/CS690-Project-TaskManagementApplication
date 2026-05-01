@@ -10,3 +10,4 @@
 10|Car Service|Vehicle maintenance check|05/08/2026 00:00:00|Medium|Errand|05/08/2026 09:00:00|05/08/2026 10:30:00|To Do
 11|Fix Bugs|Resolve login and UI issues|04/20/2026 00:00:00|High|Work|04/18/2026 10:00:00|04/18/2026 13:00:00|In Progress
 12|Submit Report|Monthly performance report submission|04/25/2026 00:00:00|Medium|Work|04/24/2026 09:00:00|04/24/2026 11:00:00|In Progress
+13|Record Loom video|Record Loom video for project|05/05/2026 00:00:00|High|Work|05/01/2026 05:57:00|05/01/2026 23:59:00|To Do
