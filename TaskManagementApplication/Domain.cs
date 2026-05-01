@@ -1,6 +1,6 @@
 namespace TaskManagementApplication;
 
-public class Task{
+public class TaskItem{
 
    public int TaskId;
    public string TaskName { get; set; }
@@ -11,10 +11,10 @@ public class Task{
    public DateTime? StartTime { get; set; }
    public DateTime? EndTime { get; set; }
    public string Status { get; set; }
-   public string SetReminder { get; set; }
+  
    
-   public Task(int taskID, string taskName, string description, DateTime deadline, string priority, string category,
-    DateTime? starttime, DateTime? endtime, string status, string setReminder){
+   public TaskItem(int taskID, string taskName, string description, DateTime deadline, string priority, string category,
+    DateTime? starttime, DateTime? endtime, string status){
                     
             this.TaskId = taskID;        
             this.TaskName = taskName;
@@ -25,7 +25,7 @@ public class Task{
             this.Status = status;
             this.StartTime = starttime;
             this.EndTime = endtime;
-            this.SetReminder = setReminder;
+         
 
     }  
 
